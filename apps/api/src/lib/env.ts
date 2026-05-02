@@ -10,8 +10,10 @@ const envSchema = z.object({
   LOG_LEVEL: z
     .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace'])
     .default('info'),
-  PORT: z.coerce.number().default(3000),
+  PORT: z.coerce.number().default(3002),
   SENTRY_DSN: z.string().url({ message: 'SENTRY_DSN must be a valid URL' }),
+  SUPABASE_URL: z.string().url({ message: 'SUPABASE_URL must be a valid URL' }),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, { message: 'SUPABASE_SERVICE_ROLE_KEY is required' }),
 })
 
 const parsed = envSchema.safeParse(process.env)
