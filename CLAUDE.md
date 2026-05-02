@@ -1,5 +1,5 @@
 # CLOSER — Master Prompt para Claude Code
-## CRM vertical para imobiliária PT | Protótipo interno single-tenant | 4 semanas | 3h/dia
+## CRM vertical para imobiliária PT | B2B SaaS multi-tenant | 4 semanas | 3h/dia
 
 ---
 
@@ -39,11 +39,11 @@ Regras de colaboração não-negociáveis:
 
 **Closer** é um **CRM vertical para agentes imobiliários portugueses**. Não é GoHighLevel. Não é HubSpot. É opinionated software construído à volta de como um agente solo português trabalha realmente.
 
-A versão das próximas 4 semanas é um **protótipo interno single-tenant** que eu corro na minha operação (Elevancy) para validar a tese antes de cobrar a outros agentes.
+A versão das próximas 4 semanas é um **protótipo B2B SaaS multi-tenant**. Começo a usar na minha operação (Elevancy) para validar, mas a arquitectura suporta múltiplos clientes desde o Dia 1.
 
 O que isto significa, explicitamente:
 
-- **Single-tenant.** Só eu uso. Sem multi-tenancy, sem RLS complexo, sem credenciais por tenant. Refactor para multi-tenant é Mês 2/3, depois de validar.
+- **Multi-tenant desde o início.** Cada cliente é um `tenant`. Todos os dados têm `tenant_id`. Credenciais Meta/Twilio/Google são por tenant, guardadas encriptadas na DB.
 - **Funcional, não polido.** UI feia é aceitável. Bugs em edge cases é aceitável. **Lead a ficar sem resposta é não-aceitável. Pipeline a perder estado é não-aceitável.**
 - **Dogfooding desde o Dia 14.** Eu uso isto na Elevancy a sério. Se eu não uso, não serve para vender.
 
@@ -217,7 +217,6 @@ Auth Supabase para mim entrar. Mobile-responsive obrigatório.
 
 Lista exaustiva. Se te ocorrer adicionar algo abaixo, a resposta é não:
 
-- Multi-tenancy, RLS complexa, credenciais por tenant — Mês 2/3
 - Document Engine (CMI auto, leitura de caderneta predial, certidão permanente) — Mês 2
 - Voice Engine (clonagem de voz do agente para email/WhatsApp) — Mês 3
 - Gerador de campanhas Meta — Mês 3
@@ -348,9 +347,11 @@ Monorepo com Turborepo + npm workspaces. API, workers, e web partilham `shared-t
 
 ---
 
-## 8. SCHEMA DA BASE DE DADOS — primeira migration
+## 8. SCHEMA DA BASE DE DADOS — migrations
 
-Single-tenant. Sem `tenant_id`. Quando migrarmos para multi-tenant adicionamos via migration nova.
+Multi-tenant desde o início. Todas as tabelas de dados têm `tenant_id`. Credenciais por tenant em `tenant_integrations` (encriptadas). Webhook routing por `tenants.webhook_token`.
+
+**Migration 0002_multi_tenant.sql** acrescenta ao schema inicial:
 
 ```sql
 -- 0001_initial.sql
@@ -904,4 +905,9 @@ Projecto: myfqdtnbxowifbfereqt.supabase.co — West EU (Ireland)
 2026-05-02 — Sessão 2
 Migration 0001_initial.sql aplicada via Supabase Studio SQL Editor (não via CLI).
 Razão: utilizador sem experiência técnica — abordagem mais directa sem instalar Supabase CLI.
+
+2026-05-02 — Sessão 3
+Pivotado de single-tenant para multi-tenant desde o Dia 1.
+Razão: o produto é B2B SaaS com múltiplos clientes (agências/agentes). Refactor depois de 4 semanas single-tenant seria doloroso. Feito na Sessão 3 antes de escrever mais lógica de negócio.
+Impacto: tenants + users + tenant_integrations tables; tenant_id em todas as tabelas de dados; META_APP_SECRET/META_VERIFY_TOKEN saem do env e vão para DB por tenant; webhook URL routing por tenants.webhook_token.
 ```

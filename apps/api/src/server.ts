@@ -1,8 +1,9 @@
 import * as Sentry from '@sentry/node'
-import Fastify from 'fastify'
+import Fastify, { type FastifyRequest } from 'fastify'
 import { env } from './lib/env.js'
 import { logger } from './lib/logger.js'
 import health from './routes/health.js'
+import { metaLeadAdsRoutes } from './routes/webhooks/meta-lead-ads.js'
 
 Sentry.init({
   dsn: env.SENTRY_DSN,
@@ -16,7 +17,19 @@ const server = Fastify({
   },
 })
 
+// Capture raw body buffer for HMAC verification (Meta signature check)
+server.addContentTypeParser('application/json', { parseAs: 'buffer' }, (_req, body, done) => {
+  try {
+    const parsed = JSON.parse((body as Buffer).toString())
+    ;(_req as FastifyRequest & { rawBody?: Buffer }).rawBody = body as Buffer
+    done(null, parsed)
+  } catch (e) {
+    done(e as Error, undefined)
+  }
+})
+
 server.register(health)
+server.register(metaLeadAdsRoutes)
 
 server.listen({ port: env.PORT, host: '0.0.0.0' }, (err) => {
   if (err) {
