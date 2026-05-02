@@ -873,3 +873,35 @@ Razão: setup mais leve para monorepo, sem necessidade do plugin system do Nx.
 ## FIM DO DOCUMENTO
 
 Sessão 1 começa quando eu disser "vamos começar". Antes disso, lê este documento todo e diz-me se há contradição, ambiguidade, ou decisão técnica que queres clarificar. Não escrevas código. Só perguntas, se as tiveres.
+
+---
+
+## 16. DECISÕES ACUMULADAS
+
+```
+2026-05-02 — Sessão 1
+Decidido usar Turborepo em vez de Nx.
+Razão: setup mais leve para monorepo de 3 apps + 3 packages, sem necessidade do plugin system do Nx.
+
+2026-05-02 — Sessão 1
+API corre na porta 3002 em desenvolvimento (3000 ocupada pelo Elevancy website).
+Razão: evitar conflito com o servidor de desenvolvimento do site Elevancy que corre em paralelo.
+
+2026-05-02 — Sessão 1
+ESLint 9 flat config adoptado para api e workers. Web app usa "next lint" stub por agora.
+Razão: eslint-config-next@14 requer ESLint 8, incompatível com ESLint 9. Resolver na Sessão 3 quando construirmos o web app a sério.
+
+2026-05-02 — Sessão 1
+SENTRY_DSN obrigatório em todos os ambientes desde o Dia 1.
+Razão: alinhado com princípio da secção 4 ("Sentry em todos os ambientes").
+DSN do projecto: closer-75.sentry.io
+
+2026-05-02 — Sessão 2
+Supabase usa novo formato de chaves (sb_publishable_ e sb_secret_) em vez do legacy JWT.
+Razão: projecto criado com o novo formato. Supabase JS client v2 suporta ambos.
+Projecto: myfqdtnbxowifbfereqt.supabase.co — West EU (Ireland)
+
+2026-05-02 — Sessão 2
+Migration 0001_initial.sql aplicada via Supabase Studio SQL Editor (não via CLI).
+Razão: utilizador sem experiência técnica — abordagem mais directa sem instalar Supabase CLI.
+```
