@@ -4,6 +4,9 @@ import { env } from './lib/env.js'
 import { logger } from './lib/logger.js'
 import health from './routes/health.js'
 import { metaLeadAdsRoutes } from './routes/webhooks/meta-lead-ads.js'
+import { ownersRoutes } from './routes/owners/index.js'
+import { propertiesRoutes } from './routes/properties/index.js'
+import { leadsRoutes } from './routes/leads/index.js'
 
 Sentry.init({
   dsn: env.SENTRY_DSN,
@@ -30,6 +33,9 @@ server.addContentTypeParser('application/json', { parseAs: 'buffer' }, (_req, bo
 
 server.register(health)
 server.register(metaLeadAdsRoutes)
+server.register(ownersRoutes)
+server.register(propertiesRoutes)
+server.register(leadsRoutes)
 
 server.listen({ port: env.PORT, host: '0.0.0.0' }, (err) => {
   if (err) {
